@@ -58,7 +58,11 @@ function PlayLinks({ entry }: { entry: Draft }) {
         </svg>
       );
     }
-    return <span className="platform-icon fallback-icon" aria-hidden="true">↗</span>;
+    return (
+      <span className="platform-icon fallback-icon" aria-hidden="true">
+        ↗
+      </span>
+    );
   }
 
   return (
@@ -92,9 +96,7 @@ function DraftFields({ draft, onChange }: { draft: Draft; onChange: (value: Draf
         >
           {kinds.map((kind) => (
             <option key={kind} value={kind}>
-              {kind === "label"
-                ? "Record label"
-                : kind.charAt(0).toUpperCase() + kind.slice(1)}
+              {kind === "label" ? "Record label" : kind.charAt(0).toUpperCase() + kind.slice(1)}
             </option>
           ))}
         </select>
@@ -751,78 +753,78 @@ export default function Home() {
                     <h3>Listened</h3>
                   </li>
                 )}
-              <li className="entry">
-                <div className={"stamp " + entry.kind} aria-hidden="true">
-                  {entry.kind === "label" ? "▦" : entry.kind === "note" ? "≡" : "◉"}
-                </div>
-                <div className="entry-info">
-                  <p className="kind">
-                    {entry.kind === "label" ? "Record label" : entry.kind}
-                    {entry.listened ? " · Listened" : ""}
-                  </p>
-                  <h3>{entry.title}</h3>
-                  {(entry.artist || entry.friend || entry.year) && (
-                    <p>
-                      {[entry.artist, entry.year, entry.friend ? "From " + entry.friend : ""]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
-                  )}
-                  <div className="chips">
-                    {entry.tags.map((tag, index) => (
-                      <span key={index}>{tag}</span>
-                    ))}
+                <li className="entry">
+                  <div className={"stamp " + entry.kind} aria-hidden="true">
+                    {entry.kind === "label" ? "▦" : entry.kind === "note" ? "≡" : "◉"}
                   </div>
-                  <PlayLinks entry={entry} />
-                  {entry.original && (
-                    <details>
-                      <summary>Original text</summary>
-                      <p className="original">{entry.original}</p>
-                    </details>
-                  )}
-                </div>
-                <div className="row-actions">
-                  <button
-                    className="quiet"
-                    onClick={() => {
-                      setEditing(entry);
-                      setManual(entry);
-                      setMode("manual");
-                      document.getElementById("capture-title")?.scrollIntoView();
-                    }}
-                  >
-                    Edit<span className="sr"> {entry.title}</span>
-                  </button>
-                  <button
-                    className="quiet"
-                    onClick={() => {
-                      const next = { ...entry, listened: !entry.listened };
-                      void mutate(
-                        entries.map((item) => (item.id === entry.id ? next : item)),
-                        { upsert: [next] },
-                        next.listened
-                          ? "Marked as listened."
-                          : "Returned to your listening backlog.",
-                      );
-                    }}
-                  >
-                    {entry.listened ? "Mark unlistened" : "Mark listened"}
-                    <span className="sr"> {entry.title}</span>
-                  </button>
-                  <button
-                    className="quiet"
-                    onClick={() =>
-                      void mutate(
-                        entries.filter((item) => item.id !== entry.id),
-                        { remove: [entry.id] },
-                        "Entry removed.",
-                      )
-                    }
-                  >
-                    Remove<span className="sr"> {entry.title}</span>
-                  </button>
-                </div>
-              </li>
+                  <div className="entry-info">
+                    <p className="kind">
+                      {entry.kind === "label" ? "Record label" : entry.kind}
+                      {entry.listened ? " · Listened" : ""}
+                    </p>
+                    <h3>{entry.title}</h3>
+                    {(entry.artist || entry.friend || entry.year) && (
+                      <p>
+                        {[entry.artist, entry.year, entry.friend ? "From " + entry.friend : ""]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    )}
+                    <div className="chips">
+                      {entry.tags.map((tag, index) => (
+                        <span key={index}>{tag}</span>
+                      ))}
+                    </div>
+                    <PlayLinks entry={entry} />
+                    {entry.original && (
+                      <details>
+                        <summary>Original text</summary>
+                        <p className="original">{entry.original}</p>
+                      </details>
+                    )}
+                  </div>
+                  <div className="row-actions">
+                    <button
+                      className="quiet"
+                      onClick={() => {
+                        setEditing(entry);
+                        setManual(entry);
+                        setMode("manual");
+                        document.getElementById("capture-title")?.scrollIntoView();
+                      }}
+                    >
+                      Edit<span className="sr"> {entry.title}</span>
+                    </button>
+                    <button
+                      className="quiet"
+                      onClick={() => {
+                        const next = { ...entry, listened: !entry.listened };
+                        void mutate(
+                          entries.map((item) => (item.id === entry.id ? next : item)),
+                          { upsert: [next] },
+                          next.listened
+                            ? "Marked as listened."
+                            : "Returned to your listening backlog.",
+                        );
+                      }}
+                    >
+                      {entry.listened ? "Mark unlistened" : "Mark listened"}
+                      <span className="sr"> {entry.title}</span>
+                    </button>
+                    <button
+                      className="quiet"
+                      onClick={() =>
+                        void mutate(
+                          entries.filter((item) => item.id !== entry.id),
+                          { remove: [entry.id] },
+                          "Entry removed.",
+                        )
+                      }
+                    >
+                      Remove<span className="sr"> {entry.title}</span>
+                    </button>
+                  </div>
+                </li>
               </Fragment>
             ))}
           </ul>
