@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: CratePending batch API learning deployment with mocked model responses.
+Resources:
+  BatchApi:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      CodeUri: ../../
+      Handler: CratePending
+      Runtime: dotnet10
+      Timeout: 10
+      MemorySize: 256
+      Environment:
+        Variables:
+          Ai__Mock: "true"
+      Events:
+        Parse:
+          Type: HttpApi
+          Properties:
+            Path: /api/batch/parse
+            Method: POST
+Outputs:
+  BatchEndpoint:
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/api/batch/parse"

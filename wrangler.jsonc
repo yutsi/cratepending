@@ -1,0 +1,13 @@
+{
+  "name": "cratepending",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-17",
+  "assets": { "directory": "./out", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  "ai": { "binding": "AI" },
+  "ratelimits": [
+    { "name": "PARSE_LIMIT", "namespace_id": "94812", "simple": { "limit": 8, "period": 60 } },
+  ],
+  "durable_objects": { "bindings": [{ "name": "CATALOG", "class_name": "Catalog" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Catalog"] }],
+  "vars": { "AI_MODEL": "@cf/openai/gpt-oss-20b" },
+}

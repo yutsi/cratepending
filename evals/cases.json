@@ -1,0 +1,40 @@
+[
+  {
+    "case": "Multiple friends",
+    "text": "Maya recommended Tipper — Cloaked. Sam said to check out Sangoma Records.",
+    "expected": [
+      {
+        "title": "Cloaked",
+        "friend": "Maya",
+        "kind": "release"
+      },
+      {
+        "title": "Sangoma Records",
+        "friend": "Sam",
+        "kind": "label"
+      }
+    ]
+  },
+  {
+    "case": "Unknown upload",
+    "text": "Jay recommended DJ Example — Moon Storage (SoundCloud upload).",
+    "expected": [
+      {
+        "title": "Moon Storage",
+        "friend": "Jay",
+        "kind": "track"
+      }
+    ]
+  },
+  {
+    "case": "Artist only",
+    "text": "Rae said to listen to Sade.",
+    "expected": [
+      {
+        "title": "Sade",
+        "friend": "Rae",
+        "kind": "artist"
+      }
+    ]
+  }
+]

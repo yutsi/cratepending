@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+.git
+.env*
+.dev.vars*
+**/bin
+**/obj
+playwright-report
+test-results

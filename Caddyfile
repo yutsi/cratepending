@@ -1,0 +1,21 @@
+:8080 {
+  handle /api/* {
+    reverse_proxy api:8080
+  }
+  handle /signin-google {
+    reverse_proxy api:8080
+  }
+  handle {
+    root * /srv
+    header {
+      X-Content-Type-Options nosniff
+      X-Frame-Options DENY
+      Referrer-Policy no-referrer
+      Permissions-Policy "camera=(), microphone=(), geolocation=()"
+      Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'"
+    }
+    file_server {
+      hide /srv/_headers
+    }
+  }
+}

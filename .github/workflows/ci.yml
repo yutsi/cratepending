@@ -1,0 +1,43 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx wrangler deploy --dry-run
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+      - run: dotnet build api/CratePending.csproj -c Release
+      - run: dotnet list api/CratePending.csproj package --vulnerable --include-transitive
+      - name: Test shared batch contract and disabled login
+        run: |
+          set -eu
+          Ai__Mock=true dotnet api/bin/Release/net10.0/CratePending.dll --urls http://127.0.0.1:5080 &
+          pid=$!
+          trap 'kill "$pid" || true' EXIT
+          curl --fail --retry 10 --retry-connrefused http://127.0.0.1:5080/api/account | jq -e '.enabled == false and .signedIn == false'
+          curl --fail -H 'Content-Type: application/json' -d '{"text":"unknown upload"}' http://127.0.0.1:5080/api/batch/parse | jq -e '.entries[0].title == "unknown upload" and (.candidates | length) == 0'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -d '{"text":" "}' http://127.0.0.1:5080/api/batch/parse)" = "400"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Origin: https://other.example' -H 'Content-Type: application/json' -d '{"text":"hi"}' http://127.0.0.1:5080/api/batch/parse)" = "403"
