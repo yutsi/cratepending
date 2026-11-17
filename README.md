@@ -1,4 +1,4 @@
-# [Open the live CratePending demo](https://cratepending.cratepending.workers.dev/)
+# [Live demo](https://cratepending.cratepending.workers.dev/)
 
 # CratePending
 
