@@ -11,7 +11,7 @@ Both endpoints use the same model ID, prompt, tool signature and response shape.
 ## Run locally
 
 1. Install Node.js 22+ and run `npm ci` and `npm run dev` to work on the browser UI. Without an API the app uses basic parsing.
-2. For the full stack, copy `.env.example` to `.env`, set a strong PostgreSQL password, and run `docker compose up --build`. Open `http://localhost:8080`.
+2. For the full stack, copy `.env.example` to `.env`, set a strong PostgreSQL password, and run `docker compose up`. Open `http://localhost:8080`. Compose loads `compose.override.yaml` automatically and starts the hot-reloading Next.js frontend, the API, and PostgreSQL. Leave the command running while editing frontend files. After changing C# files, run `docker compose up -d --build api` in a second terminal. To serve the production export locally, run `docker compose -f compose.yaml up --build`.
 3. Set `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_AI_TOKEN` and `MUSICBRAINZ_CONTACT` for live enrichment. Set `AI_MOCK=true` for a deterministic API smoke test.
 4. To enable accounts, configure Google OAuth credentials and register `http://localhost:8080/signin-google` for local testing. For a hosted backend, use HTTPS and the production callback URL, configure trusted proxy handling and `App__Origin`, and persist ASP.NET data protection keys securely. Google sign-in should ship with a PostgreSQL account-isolation test and a review of account deletion and backup retention.
 

@@ -1,0 +1,41 @@
+services:
+  web:
+    image: caddy:2-alpine
+    build: !reset null
+    depends_on:
+      - frontend
+    configs:
+      - source: dev_caddy
+        target: /etc/caddy/Caddyfile
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    init: true
+    command: sh -c "npm ci --no-audit --no-fund && exec npm run dev -- --hostname 0.0.0.0 --webpack"
+    environment:
+      WATCHPACK_POLLING: "1000"
+      NEXT_PUBLIC_REPO_URL: ${NEXT_PUBLIC_REPO_URL:-}
+    volumes:
+      - .:/app
+      - frontend_modules:/app/node_modules
+      - frontend_next:/app/.next
+
+configs:
+  dev_caddy:
+    content: |
+      :8080 {
+        handle /api/* {
+          reverse_proxy api:8080
+        }
+        handle /signin-google {
+          reverse_proxy api:8080
+        }
+        handle {
+          reverse_proxy frontend:3000
+        }
+      }
+
+volumes:
+  frontend_modules:
+  frontend_next:

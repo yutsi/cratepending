@@ -29,7 +29,7 @@ function PlayLinks({ entry }: { entry: Draft }) {
   return (
     <div className="links">
       {links(entry).map((link) => (
-        <a key={link.label} href={link.url} target="_blank" rel="noreferrer">
+        <a className={`platform-link ${(link.label.split(" ")[0] ?? "platform").toLowerCase()}`} key={link.label} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label} title={link.label}>
           {link.label} <span aria-hidden="true">↗</span>
         </a>
       ))}
@@ -390,7 +390,7 @@ export default function Home() {
           <h1>
             What’s on
             <br />
-            your <em>list?</em>
+            your <span>list?</span>
           </h1>
           <p>Save what you want to hear. Find the right thing to play when you’re ready.</p>
         </section>
