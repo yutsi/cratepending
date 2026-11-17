@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
+import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import {
   basicParse,
   cleanDraft,
@@ -26,11 +26,55 @@ type Mode = "batch" | "manual";
 const repo = process.env.NEXT_PUBLIC_REPO_URL;
 
 function PlayLinks({ entry }: { entry: Draft }) {
+  function PlatformIcon({ name }: { name: string }) {
+    if (name === "Spotify") {
+      return (
+        <svg className="platform-icon spotify-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M7 9.5c3.7-1 7.1-.6 10 .8M7.7 12.5c3-.7 5.7-.4 8.2.7M8.6 15.3c2.3-.4 4.3-.1 6.2.6" />
+        </svg>
+      );
+    }
+    if (name === "YouTube") {
+      return (
+        <svg className="platform-icon youtube-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="6" width="18" height="12" rx="4" />
+          <path d="m10 9 5 3-5 3Z" />
+        </svg>
+      );
+    }
+    if (name === "Bandcamp") {
+      return (
+        <svg className="platform-icon bandcamp-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 17h8l8-10h-8Z" />
+        </svg>
+      );
+    }
+    if (name === "SoundCloud") {
+      return (
+        <svg className="platform-icon soundcloud-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 16.5h1M5.5 14v2.5M8 12v4.5M10.5 10.5v6M13 11.5a5 5 0 0 1 4.2 5H13Z" />
+          <path d="M3 18h14.2a3.2 3.2 0 0 0 .5-6.4A5.8 5.8 0 0 0 7 12.7" />
+        </svg>
+      );
+    }
+    return <span className="platform-icon fallback-icon" aria-hidden="true">↗</span>;
+  }
+
   return (
     <div className="links">
       {links(entry).map((link) => (
-        <a className={`platform-link ${(link.label.split(" ")[0] ?? "platform").toLowerCase()}`} key={link.label} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label} title={link.label}>
-          {link.label} <span aria-hidden="true">↗</span>
+        <a
+          className={`platform-link ${(link.label.split(" ")[0] ?? "platform").toLowerCase()}`}
+          key={link.label}
+          href={link.url}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={link.label}
+          title={link.label}
+        >
+          <PlatformIcon name={link.label.split(" ")[0] ?? ""} />
+          <span className="sr">{link.label}</span>
         </a>
       ))}
     </div>
@@ -48,13 +92,15 @@ function DraftFields({ draft, onChange }: { draft: Draft; onChange: (value: Draf
         >
           {kinds.map((kind) => (
             <option key={kind} value={kind}>
-              {kind === "label" ? "Record label" : kind}
+              {kind === "label"
+                ? "Record label"
+                : kind.charAt(0).toUpperCase() + kind.slice(1)}
             </option>
           ))}
         </select>
       </label>
       <label>
-        Title or name
+        Title/Name
         <input
           required
           maxLength={350}
@@ -76,13 +122,13 @@ function DraftFields({ draft, onChange }: { draft: Draft; onChange: (value: Draf
         Recommended by
         <input
           maxLength={350}
-          placeholder="Friend’s name or nickname"
+          placeholder="Friend's name"
           value={draft.friend}
           onChange={(e) => onChange({ ...draft, friend: e.target.value })}
         />
       </label>
       <label>
-        Mood or genre
+        Mood/Genre
         <input
           placeholder="Ambient, mellow"
           maxLength={200}
@@ -118,6 +164,7 @@ export default function Home() {
   const [note, setNote] = useState("");
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [selectedCandidates, setSelectedCandidates] = useState<Record<number, string>>({});
   const [years, setYears] = useState<Record<number, number | undefined>>({});
   const [manual, setManual] = useState<Draft>(empty);
   const [editing, setEditing] = useState<Entry>();
@@ -241,6 +288,7 @@ export default function Home() {
     setBusy(true);
     setDrafts([]);
     setCandidates([]);
+    setSelectedCandidates({});
     setYears({});
     setStatus("Reading your note…");
     try {
@@ -275,6 +323,7 @@ export default function Home() {
     setNote("");
     setDrafts([]);
     setCandidates([]);
+    setSelectedCandidates({});
     setYears({});
   }
 
@@ -323,6 +372,9 @@ export default function Home() {
       .toLowerCase()
       .includes(filter.toLowerCase()),
   );
+  const waiting = visible.filter((entry) => !entry.listened);
+  const listened = visible.filter((entry) => entry.listened);
+  const displayEntries = [...waiting, ...listened];
 
   return (
     <>
@@ -514,8 +566,16 @@ export default function Home() {
                           <label>
                             MusicBrainz candidates
                             <select
-                              value=""
+                              value={
+                                selectedCandidates[index] ??
+                                candidates.find((candidate) => candidate.kind === draft.kind)?.id ??
+                                ""
+                              }
                               onChange={(event) => {
+                                setSelectedCandidates({
+                                  ...selectedCandidates,
+                                  [index]: event.target.value,
+                                });
                                 const item = candidates.find(
                                   (candidate) => candidate.id === event.target.value,
                                 );
@@ -536,7 +596,6 @@ export default function Home() {
                                 }
                               }}
                             >
-                              <option value="">Choose a match if it’s yours</option>
                               {candidates
                                 .filter((candidate) => candidate.kind === draft.kind)
                                 .map((candidate) => (
@@ -554,6 +613,16 @@ export default function Home() {
                           className="quiet"
                           onClick={() => {
                             setDrafts(drafts.filter((_, i) => i !== index));
+                            setSelectedCandidates(
+                              Object.fromEntries(
+                                Object.entries(selectedCandidates)
+                                  .filter(([key]) => Number(key) !== index)
+                                  .map(([key, value]) => [
+                                    Number(key) > index ? Number(key) - 1 : Number(key),
+                                    value,
+                                  ]),
+                              ),
+                            );
                             setYears(
                               Object.fromEntries(
                                 Object.entries(years)
@@ -659,7 +728,7 @@ export default function Home() {
               <p>{entries.filter((entry) => !entry.listened).length} waiting to explore</p>
             </div>
             <div className="actions">
-              <label>
+              <label className="filter-control">
                 <span className="sr">Filter entries</span>
                 <input
                   type="search"
@@ -675,8 +744,14 @@ export default function Home() {
           </div>
           {visible.length === 0 && <p className="hint">No entries to show.</p>}
           <ul className="entry-list">
-            {visible.map((entry) => (
-              <li key={entry.id} className="entry">
+            {displayEntries.map((entry, index) => (
+              <Fragment key={entry.id}>
+                {entry.listened && (index === 0 || !displayEntries[index - 1]?.listened) && (
+                  <li className="section-break" aria-label="Listened entries">
+                    <h3>Listened</h3>
+                  </li>
+                )}
+              <li className="entry">
                 <div className={"stamp " + entry.kind} aria-hidden="true">
                   {entry.kind === "label" ? "▦" : entry.kind === "note" ? "≡" : "◉"}
                 </div>
@@ -748,6 +823,7 @@ export default function Home() {
                   </button>
                 </div>
               </li>
+              </Fragment>
             ))}
           </ul>
         </section>
