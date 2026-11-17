@@ -1,3 +1,5 @@
+# [Open the live CratePending demo](https://cratepending.cratepending.workers.dev/)
+
 # CratePending
 
 CratePending is a music backlog for releases, tracks, artists, and record labels. Capture a friend’s recommendations in one note, review what an agent found, or save your original text. Ask for a record label, a mood or genre, something from a friend, or the entry that has waited longest.

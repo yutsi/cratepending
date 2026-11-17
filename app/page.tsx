@@ -427,7 +427,7 @@ export default function Home() {
           <p>
             <span className="demo-dot" aria-hidden="true" />
             <strong>{account?.enabled ? "Guest access" : "Free-tier demo"}</strong>{" "}
-            <span>Live AI runs within a shared quota. Guest saves last for this tab session.</span>
+            <span>Demo uses Worker AI instead of C# backend. Login is disabled.</span>
           </p>
           {repo ? (
             <a href={repo} target="_blank" rel="noreferrer">
@@ -441,12 +441,10 @@ export default function Home() {
       <main id="main" className="shell">
         <section className="intro">
           <p className="eyebrow">THE LISTENING BACKLOG</p>
-          <h1>
-            What’s on
-            <br />
-            your <span>list?</span>
-          </h1>
-          <p>Save what you want to hear. Find the right thing to play when you’re ready.</p>
+          <p>
+            Save what you want to hear. Keep track of recommendations from friends. Find the right
+            thing to play when you’re ready.
+          </p>
         </section>
         <div className="dashboard">
           <section className="panel capture" aria-labelledby="capture-title">
